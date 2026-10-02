@@ -238,9 +238,9 @@ dialog{overflow-y:auto;-webkit-overflow-scrolling:touch}
 .pinch .pr{animation:pr 2.2s ease-in-out infinite;transform-origin:32px 32px}
 @keyframes pin{0%,15%{transform:translate(0,0)}60%,100%{transform:translate(0,0)}}
 .pinch .pd1{animation-name:pin1}.pinch .pd2{animation-name:pin2}
-@keyframes pin1{0%,100%{transform:translate(0,0)}55%{transform:translate(13px,13px)}}
-@keyframes pin2{0%,100%{transform:translate(0,0)}55%{transform:translate(-13px,-13px)}}
-@keyframes pr{0%,100%{transform:scale(1);opacity:.5}55%{transform:scale(.55);opacity:.9}}
+@keyframes pin1{0%,100%{transform:translate(13px,13px)}55%{transform:translate(-4px,-4px)}}
+@keyframes pin2{0%,100%{transform:translate(-13px,-13px)}55%{transform:translate(4px,4px)}}
+@keyframes pr{0%,100%{transform:scale(.55);opacity:.9}55%{transform:scale(1);opacity:.5}}
 .h-mouse{display:none}
 @media (hover:hover) and (pointer:fine){.h-touch{display:none}.h-mouse{display:block}}
 @media(prefers-reduced-motion:reduce){.pinch .pd,.pinch .pr{animation:none}}
@@ -288,11 +288,11 @@ dialog{overflow-y:auto;-webkit-overflow-scrolling:touch}
    <div><span>Resident house parent (RHP)</span><b>Siva Shanmugam Sir</b></div>
    <div><span>Resident house mothers (RHM)</span><b>Padmavathi Ma’am and Rini Ma’am</b></div>
   </div>
-  <div class="pinch" id="pinch" role="button" tabindex="0" aria-label="Zoom out to enter the portal. Press Enter or minus to continue.">
+  <div class="pinch" id="pinch" role="button" tabindex="0" aria-label="Spread two fingers apart to enter the portal. Press Enter or plus to continue.">
    <svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true"><circle class="pr" cx="32" cy="32" r="28" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 5" opacity=".5"/><circle class="pd pd1" cx="14" cy="14" r="5" fill="currentColor"/><circle class="pd pd2" cx="50" cy="50" r="5" fill="currentColor"/></svg>
-   <b>Pinch in to zoom out</b>
-   <small class="h-touch">Bring two fingers together to enter the portal</small>
-   <small class="h-mouse">On a computer: Ctrl + scroll down, pinch the trackpad, or press −</small>
+   <b>Spread out to zoom in</b>
+   <small class="h-touch">Place two fingers close together, then move them apart to enter the portal</small>
+   <small class="h-mouse">On a computer: Ctrl + scroll up, spread the trackpad, or press +</small>
   </div>
   <p class="w-credit"><span>Made by:</span> Yugvir Satyam Mehta, KRG Ashwanth, S S Sebevelan<br><span>Powered by:</span> People of Krishnalaya</p>
  </div>
@@ -441,21 +441,21 @@ function show(m){mode=m;cancelAnimationFrame(anim);
 function enter(){if(mode!=='welcome')return;mode='busy';if(prog<=0)paint(.02);tween(1,()=>{location.hash='portal';show('portal')})}
 function route(){if($('#dlg').open)$('#dlg').close();show(location.hash==='#portal'?'portal':'welcome')}
 addEventListener('hashchange',route);
-/* touch pinch (two fingers moving together) */
+/* touch spread (two fingers moving apart) */
 let d0=0;const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
 W.addEventListener('touchstart',e=>{if(mode!=='welcome')return;if(e.touches.length===2){cancelAnimationFrame(anim);d0=dist(e.touches)}},{passive:true});
 W.addEventListener('touchmove',e=>{if(mode!=='welcome'||e.touches.length!==2||!d0)return;e.preventDefault();
- const g=(d0-dist(e.touches))/(d0*.4);if(g<=.02)return paint(0);if(g>=1){d0=0;return enter()}paint(g*LIM)},{passive:false});
+ const g=(dist(e.touches)-d0)/Math.max(d0*.5,90);if(g<=.02)return paint(0);if(g>=1){d0=0;return enter()}paint(g*LIM)},{passive:false});
 const endT=e=>{if(!d0||e.touches.length>=2)return;d0=0;if(mode!=='welcome')return;tween(0)};
 W.addEventListener('touchend',endT);W.addEventListener('touchcancel',endT);
 ['gesturestart','gesturechange'].forEach(n=>W.addEventListener(n,e=>e.preventDefault()));
 /* trackpad pinch / Ctrl + scroll */
 W.addEventListener('wheel',e=>{if(!e.ctrlKey||mode!=='welcome')return;e.preventDefault();
- cancelAnimationFrame(anim);paint(Math.max(0,Math.min(1,prog+e.deltaY/300)));
+ cancelAnimationFrame(anim);paint(Math.max(0,Math.min(1,prog-e.deltaY/300)));
  if(prog>=LIM)return enter();clearTimeout(idle);idle=setTimeout(()=>{mode==='welcome'&&tween(0)},260)},{passive:false});
 /* keyboard */
 addEventListener('keydown',e=>{if(mode!=='welcome'||e.target.closest('dialog'))return;
- if(e.key==='-'||e.key==='_'||e.key==='Subtract'||(e.key==='Enter'&&e.target===PN)||(e.key===' '&&e.target===PN)){e.preventDefault();enter()}});
+ if(e.key==='+'||e.key==='='||e.key==='-'||e.key==='_'||e.key==='Add'||e.key==='Subtract'||(e.key==='Enter'&&e.target===PN)||(e.key===' '&&e.target===PN)){e.preventDefault();enter()}});
 
 /* ================= Admin: password-protected editing ================= */
 const PW_HASH='a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3';
